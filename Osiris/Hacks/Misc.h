@@ -7,6 +7,8 @@ class GameEvent;
 struct ImDrawList;
 struct UserCmd;
 
+
+
 namespace Misc
 {
     bool shouldRevealMoney() noexcept;
@@ -74,4 +76,6 @@ namespace Misc
     json toJson() noexcept;
     void fromJson(const json& j) noexcept;
     void resetConfig() noexcept;
+
+    static int counttesttest{0};
 }

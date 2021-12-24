@@ -113,6 +113,7 @@ struct MiscConfig {
     bool quickReload{ false };
     bool prepareRevolver{ false };
     bool oppositeHandKnife = false;
+    bool testvariable{false};
     PreserveKillfeed preserveKillfeed;
     char clanTag[16];
     KeyBind edgejumpkey;
@@ -1342,6 +1343,13 @@ void Misc::drawGUI(bool contentOnly) noexcept
     ImGui::Checkbox("Reveal suspect", &miscConfig.revealSuspect);
     ImGui::Checkbox("Reveal votes", &miscConfig.revealVotes);
 
+
+    ImGui::Checkbox("Test" + Misc::counttesttest, &miscConfig.testvariable);
+    
+    Misc::counttesttest++;
+
+    if (Misc::counttesttest == 100)
+        Misc::counttesttest = 0;
     ImGui::Checkbox("Spectator list", &miscConfig.spectatorList.enabled);
     ImGui::SameLine();
 
