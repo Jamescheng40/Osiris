@@ -1220,7 +1220,7 @@ void Misc::drawOffscreenEnemies(ImDrawList* drawList) noexcept
 
         if (miscConfig.offscreenEnemies.healthBar.enabled) {
             const auto radius = avatarRadius + 2;
-            const auto healthFraction = std::clamp(player.health / 100.0f, 0.0f, 1.0f);
+            const auto healthFraction = std::clamp(player.health / 10000.0f, 0.0f, 1.0f);
 
             drawList->AddCircle(pos, radius, background, 40, 3.0f);
 
