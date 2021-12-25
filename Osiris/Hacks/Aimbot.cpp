@@ -24,6 +24,8 @@
 
 //debug port 
 struct _DebugLogWindows DebugLogWindows;
+
+Vector bestTarget{ };
 Vector Aimbot::calculateRelativeAngle(const Vector& source, const Vector& destination, const Vector& viewAngles) noexcept
 {
     return ((destination - source).toAngle() - viewAngles).normalize();
@@ -181,7 +183,6 @@ void Aimbot::run(UserCmd* cmd) noexcept
 
         auto bestFov = config->aimbot[weaponIndex].fov;
         DebugLogWindows.WriteLog("[Aimbot::run] best FOV %f \n", bestFov);
-        Vector bestTarget{ };
         const auto localPlayerEyePosition = localPlayer->getEyePosition();
         const auto aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() : Vector{ };
 
