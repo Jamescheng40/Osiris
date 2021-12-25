@@ -240,7 +240,10 @@ void Aimbot::run(UserCmd* cmd) noexcept
             angle /= config->aimbot[weaponIndex].smooth;
             cmd->viewangles += angle;
             if (!config->aimbot[weaponIndex].silent)
+            {
+                DebugLogWindows.WriteLog("[Aimbot::run][inside set angle]Here to set angle \n");
                 interfaces->engine->setViewAngles(cmd->viewangles);
+            }
 
             if (config->aimbot[weaponIndex].autoScope && activeWeapon->nextPrimaryAttack() <= memory->globalVars->serverTime() && activeWeapon->isSniperRifle() && !localPlayer->isScoped())
             {
@@ -258,10 +261,15 @@ void Aimbot::run(UserCmd* cmd) noexcept
                 DebugLogWindows.WriteLog("[Aimbot::run]  clamped third if UserCmd::IN_ATTAC \n");
                 cmd->buttons &= ~UserCmd::IN_ATTACK;
             }
-            if (clamped || config->aimbot[weaponIndex].smooth > 1.0f) lastAngles = cmd->viewangles;
+            if (clamped || config->aimbot[weaponIndex].smooth > 1.0f)
+            {
+                DebugLogWindows.WriteLog("[Aimbot::run] lastAngles = cmd->viewangles; \n");
+                lastAngles = cmd->viewangles;
+            }
             else lastAngles = Vector{ };
 
             lastCommand = cmd->commandNumber;
+            DebugLogWindows.WriteLog("[Aimbot::run] last command %d \n", lastCommand);
         }
     }
 }
