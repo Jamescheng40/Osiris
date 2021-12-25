@@ -240,14 +240,21 @@ void Aimbot::run(UserCmd* cmd) noexcept
                 interfaces->engine->setViewAngles(cmd->viewangles);
 
             if (config->aimbot[weaponIndex].autoScope && activeWeapon->nextPrimaryAttack() <= memory->globalVars->serverTime() && activeWeapon->isSniperRifle() && !localPlayer->isScoped())
+            {
+                DebugLogWindows.WriteLog("[Aimbot::run] first if UserCmd::IN_ATTACK2 \n");
                 cmd->buttons |= UserCmd::IN_ATTACK2;
+            }
 
             if (config->aimbot[weaponIndex].autoShot && activeWeapon->nextPrimaryAttack() <= memory->globalVars->serverTime() && !clamped && activeWeapon->getInaccuracy() <= config->aimbot[weaponIndex].maxShotInaccuracy)
+            {
+                DebugLogWindows.WriteLog("[Aimbot::run]  second if UserCmd::IN_ATTACK \n");
                 cmd->buttons |= UserCmd::IN_ATTACK;
-
+            }
             if (clamped)
+            {
+                DebugLogWindows.WriteLog("[Aimbot::run]  clamped third if UserCmd::IN_ATTAC \n");
                 cmd->buttons &= ~UserCmd::IN_ATTACK;
-
+            }
             if (clamped || config->aimbot[weaponIndex].smooth > 1.0f) lastAngles = cmd->viewangles;
             else lastAngles = Vector{ };
 
