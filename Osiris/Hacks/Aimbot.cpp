@@ -198,7 +198,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
                 const auto fov = std::hypot(angle.x, angle.y);
                 if (fov > bestFov)
                 {
-                    DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
+                    //DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
                     continue;
                 }
                 if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
