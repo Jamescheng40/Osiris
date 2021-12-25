@@ -31,6 +31,7 @@
 #include "Hacks/Sound.h"
 #include "Hacks/StreamProofESP.h"
 
+extern struct _DebugLogWindows DebugLogWindows;
 constexpr auto windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
 | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
@@ -109,7 +110,7 @@ void GUI::render() noexcept
         renderStyleWindow();
         Misc::drawGUI(false);
         renderConfigWindow();
-        GUI::m_logwin.Draw("Debug Windows");
+        DebugLogWindows.Draw("debug windows");
     } else {
         renderGuiStyle2();
     }
