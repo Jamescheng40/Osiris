@@ -193,7 +193,9 @@ void Aimbot::run(UserCmd* cmd) noexcept
             DebugLogWindows.WriteLog("[Aimbot::run]  entity num %d \n", i);
             DebugLogWindows.WriteLog("entity health %d \n", entity->health());
             for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
+                //below line trying to get bone config in the GUI and get the actual position of the bone
                 const auto bonePosition = entity->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
+                
                 const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
                 
                 const auto fov = std::hypot(angle.x, angle.y);
@@ -208,6 +210,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
                 if (!entity->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(entity, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? entity->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
                     continue;
 
+                //best target is the bone position
                 if (fov < bestFov) {
                     bestFov = fov;
                     bestTarget = bonePosition;
@@ -248,7 +251,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
             if (config->aimbot[weaponIndex].autoShot && activeWeapon->nextPrimaryAttack() <= memory->globalVars->serverTime() && !clamped && activeWeapon->getInaccuracy() <= config->aimbot[weaponIndex].maxShotInaccuracy)
             {
                 DebugLogWindows.WriteLog("[Aimbot::run]  second if UserCmd::IN_ATTACK \n");
-                cmd->buttons |= UserCmd::IN_ATTACK;
+               // cmd->buttons |= UserCmd::IN_ATTACK;
             }
             if (clamped)
             {

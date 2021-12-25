@@ -52,6 +52,7 @@ public:
         int minDamage{ 1 };
         bool killshot{ false };
         bool betweenShots{ true };
+        bool locktargetuntildead{ true };
     };
     std::array<Aimbot, 40> aimbot;
     bool aimbotOnKey{ false };
