@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="ConfigStructs.cpp" />
+    <ClCompile Include="DebugWindows.cpp" />
     <ClCompile Include="EventListener.cpp" />
     <ClCompile Include="freetype\src\autofit\autofit.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -200,6 +201,7 @@
   <ItemGroup>
     <ClInclude Include="Config.h" />
     <ClInclude Include="ConfigStructs.h" />
+    <ClInclude Include="DebugWindows.h" />
     <ClInclude Include="EventListener.h" />
     <ClInclude Include="fnv.h" />
     <ClInclude Include="freetype\freetype\config\ftmodule.h" />

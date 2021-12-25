@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "DebugWindows.h"
 
 struct ImFont;
 
@@ -21,7 +22,7 @@ private:
     void renderStyleWindow(bool contentOnly = false) noexcept;
     void renderConfigWindow(bool contentOnly = false) noexcept;
     void renderGuiStyle2() noexcept;
-
+    ExampleAppLog m_log;
     struct {
         bool aimbot = false;
         bool triggerbot = false;
