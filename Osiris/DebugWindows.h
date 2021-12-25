@@ -9,7 +9,7 @@
 
 
 
-struct DebugLogWindows
+struct _DebugLogWindows
 {
     ImGuiTextBuffer     Buf;
     ImGuiTextFilter     Filter;
@@ -20,13 +20,17 @@ struct DebugLogWindows
     void Clear() { Buf.clear(); LineOffsets.clear(); }
 
     //appendv
-    void WriteLog(const char* fmt, ...) IM_FMTLIST(2)
+    void WriteLog(const char* fmt, ...) IM_FMTARGS(2)
     {
-        va_list args = NULL;
+        int old_size = Buf.size();
+        va_list args;
+        va_start(args, fmt);
         Buf.appendfv(fmt, args);
-        ScrollToBottom = true;
+        va_end(args);
+        for (int new_size = Buf.size(); old_size < new_size; old_size++)
+            if (Buf[old_size] == '\n')
+                LineOffsets.push_back(old_size + 1);
     }
-
     void Draw(const char* title, bool* p_opened = NULL)
     {
  
@@ -70,6 +74,5 @@ struct DebugLogWindows
         ImGui::End();
     }
 };
-
 
 #endif

@@ -22,7 +22,7 @@ private:
     void renderStyleWindow(bool contentOnly = false) noexcept;
     void renderConfigWindow(bool contentOnly = false) noexcept;
     void renderGuiStyle2() noexcept;
-    DebugLogWindows m_logwin;
+
     int m_testvar{ 100 };
 
     struct {
