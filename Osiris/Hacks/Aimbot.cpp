@@ -180,6 +180,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
             return;
 
         auto bestFov = config->aimbot[weaponIndex].fov;
+        DebugLogWindows.WriteLog("[Aimbot::run] best FOV %f \n", bestFov);
         Vector bestTarget{ };
         const auto localPlayerEyePosition = localPlayer->getEyePosition();
         const auto aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() : Vector{ };
@@ -189,15 +190,17 @@ void Aimbot::run(UserCmd* cmd) noexcept
             if (!entity || entity == localPlayer.get() || entity->isDormant() || !entity->isAlive()
                 || !entity->isOtherEnemy(localPlayer.get()) && !config->aimbot[weaponIndex].friendlyFire || entity->gunGameImmunity())
                 continue;
-
+            DebugLogWindows.WriteLog("[Aimbot::run]  entity health %d \n", entity->health());
             for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
                 const auto bonePosition = entity->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
                 const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
                 
                 const auto fov = std::hypot(angle.x, angle.y);
                 if (fov > bestFov)
+                {
+                    DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
                     continue;
-
+                }
                 if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
                     continue;
 
@@ -207,6 +210,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
                 if (fov < bestFov) {
                     bestFov = fov;
                     bestTarget = bonePosition;
+                    DebugLogWindows.WriteLog("[Aimbot::run]  bestFov in the bone %f \n", bestFov);
                 }
                 if (config->aimbot[weaponIndex].bone)
                     break;
