@@ -9,7 +9,7 @@
 
 
 
-struct ExampleAppLog
+struct DebugLogWindows
 {
     ImGuiTextBuffer     Buf;
     ImGuiTextFilter     Filter;
@@ -19,19 +19,13 @@ struct ExampleAppLog
 
     void Clear() { Buf.clear(); LineOffsets.clear(); }
 
-    //void AddLog(const char* fmt, ...) IM_PRINTFARGS(2)
-    //{
-    //    int old_size = Buf.size();
-    //    va_list args;
-    //    va_start(args, fmt);
-    //    Buf.appendv(fmt, args);
-    //    va_end(args);
-    //    for (int new_size = Buf.size(); old_size < new_size; old_size++)
-    //        if (Buf[old_size] == '\n')
-    //            LineOffsets.push_back(old_size);
-    //    ScrollToBottom = true;
-    //}
-    //
+    //appendv
+    void WriteLog(const char* fmt, ...) IM_FMTLIST(2)
+    {
+        va_list args = NULL;
+        Buf.appendfv(fmt, args);
+        ScrollToBottom = true;
+    }
 
     void Draw(const char* title, bool* p_opened = NULL)
     {
@@ -50,7 +44,8 @@ struct ExampleAppLog
 
         if (Filter.IsActive())
         {
-            const char* buf_begin = Buf.begin();
+            //filter logic disabled
+  /*          const char* buf_begin = Buf.begin();
             const char* line = buf_begin;
             for (int line_no = 0; line != NULL; line_no++)
             {
@@ -58,7 +53,9 @@ struct ExampleAppLog
                 if (Filter.PassFilter(line, line_end))
                     ImGui::TextUnformatted(line, line_end);
                 line = line_end && line_end[1] ? line_end + 1 : NULL;
-            }
+            }*/
+
+            ImGui::TextUnformatted(Buf.begin());
         }
         else
         {

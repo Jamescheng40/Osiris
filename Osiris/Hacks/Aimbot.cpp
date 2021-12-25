@@ -22,6 +22,8 @@
 #include "../SDK/PhysicsSurfaceProps.h"
 #include "../SDK/WeaponData.h"
 
+//debug port 
+#include "../DebugWindows.h"
 Vector Aimbot::calculateRelativeAngle(const Vector& source, const Vector& destination, const Vector& viewAngles) noexcept
 {
     return ((destination - source).toAngle() - viewAngles).normalize();
@@ -180,9 +182,15 @@ void Aimbot::run(UserCmd* cmd) noexcept
         auto bestFov = config->aimbot[weaponIndex].fov;
         Vector bestTarget{ };
         const auto localPlayerEyePosition = localPlayer->getEyePosition();
-
         const auto aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() : Vector{ };
-
+        
+        DebugLogWindows m_logwin;
+        const char* hihi = "what isthis";
+            const char* entitylist = std::to_string(interfaces->engine->getMaxClients()).c_str();
+            char* final = NULL;
+            strcpy(final,hihi);
+            strcat(final, entitylist);
+        m_logwin.WriteLog(final);
         for (int i = 1; i <= interfaces->engine->getMaxClients(); i++) {
             auto entity = interfaces->entityList->getEntity(i);
             if (!entity || entity == localPlayer.get() || entity->isDormant() || !entity->isAlive()
