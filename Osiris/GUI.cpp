@@ -31,7 +31,6 @@
 #include "Hacks/Sound.h"
 #include "Hacks/StreamProofESP.h"
 
-
 constexpr auto windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
 | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
@@ -110,7 +109,7 @@ void GUI::render() noexcept
         renderStyleWindow();
         Misc::drawGUI(false);
         renderConfigWindow();
-        GUI::m_log.Draw("Title");
+        GUI::m_logwin.Draw("Debug Windows");
     } else {
         renderGuiStyle2();
     }
