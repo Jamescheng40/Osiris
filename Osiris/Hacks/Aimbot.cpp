@@ -185,40 +185,50 @@ void Aimbot::run(UserCmd* cmd) noexcept
         const auto localPlayerEyePosition = localPlayer->getEyePosition();
         const auto aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() : Vector{ };
 
+        int lowesthealth = INT_MAX;
+        auto lowesthealthentity = interfaces->entityList->getEntity(1);
         for (int i = 1; i <= interfaces->engine->getMaxClients(); i++) {
             auto entity = interfaces->entityList->getEntity(i);
+            auto curentityhp = entity->health();
             if (!entity || entity == localPlayer.get() || entity->isDormant() || !entity->isAlive()
                 || !entity->isOtherEnemy(localPlayer.get()) && !config->aimbot[weaponIndex].friendlyFire || entity->gunGameImmunity())
                 continue;
             DebugLogWindows.WriteLog("[Aimbot::run]  entity num %d \n", i);
-            DebugLogWindows.WriteLog("entity health %d \n", entity->health());
-            for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
-                //below line trying to get bone config in the GUI and get the actual position of the bone
-                const auto bonePosition = entity->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
-                
-                const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
-                
-                const auto fov = std::hypot(angle.x, angle.y);
-                if (fov > bestFov)
-                {
-                    //DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
-                    continue;
-                }
-                if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
-                    continue;
+            DebugLogWindows.WriteLog("entity health %d \n", curentityhp);
+            if (curentityhp < lowesthealth)
+            {
+                lowesthealth = curentityhp;
+                lowesthealthentity = entity;
 
-                if (!entity->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(entity, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? entity->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
-                    continue;
+                for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
+                    //below line trying to get bone config in the GUI and get the actual position of the bone
+                    const auto bonePosition = entity->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
 
-                //best target is the bone position
-                if (fov < bestFov) {
-                    bestFov = fov;
-                    bestTarget = bonePosition;
-                    DebugLogWindows.WriteLog("[Aimbot::run]  bestFov in the bone %f \n", bestFov);
+                    const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
+
+                    const auto fov = std::hypot(angle.x, angle.y);
+                    if (fov > bestFov)
+                    {
+                        //DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
+                        continue;
+                    }
+                    if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
+                        continue;
+
+                    if (!entity->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(entity, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? entity->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
+                        continue;
+
+                    //best target is the bone position
+                    if (fov < bestFov) {
+                        bestFov = fov;
+                        bestTarget = bonePosition;
+                        DebugLogWindows.WriteLog("[Aimbot::run]  bestFov in the bone %f \n", bestFov);
+                    }
+                    if (config->aimbot[weaponIndex].bone)
+                        break;
                 }
-                if (config->aimbot[weaponIndex].bone)
-                    break;
             }
+
         }
 
         if (bestTarget.notNull()) {
