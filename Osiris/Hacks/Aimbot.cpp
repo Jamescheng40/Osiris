@@ -201,7 +201,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
             return;
 
         auto bestFov = config->aimbot[weaponIndex].fov;
-        DebugLogWindows.WriteLog("[Aimbot::run] best FOV %f \n", bestFov);
+        //DebugLogWindows.WriteLog("[Aimbot::run] best FOV %f \n", bestFov);
         const auto localPlayerEyePosition = localPlayer->getEyePosition();
         const auto aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() : Vector{ };
 
