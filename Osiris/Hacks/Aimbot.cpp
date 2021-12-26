@@ -286,10 +286,10 @@ void Aimbot::run(UserCmd* cmd) noexcept
                     //check for bone visibility
                     //if (!tmp->isVisible(bonePosition) &&
                         
-                    if((config->aimbot[weaponIndex].visibleOnly || !canScan(tmp, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? tmp->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
-                    {
-                        continue;
-                    }
+                    //if((config->aimbot[weaponIndex].visibleOnly || !canScan(tmp, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? tmp->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
+                    //{
+                    //    continue;
+                    //}
                     //best target is the bone position
                     if (fov < bestFov) {
                         bestFov = fov;
