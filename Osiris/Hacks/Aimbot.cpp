@@ -156,7 +156,7 @@ void print_queue(T q) { // NB: pass by value so the print uses a copy
         if (tmp != NULL)
         {
             //std::cout << tmp->health() << ' ';
-            DebugLogWindows.WriteLog("[Aimbot::run] Priority Queue element: \n", tmp->health());
+            DebugLogWindows.WriteLog("[Aimbot::run] Priority Queue element: %d \n", tmp->health());
             q.pop();
         }
     }
