@@ -155,7 +155,8 @@ void print_queue(T q) { // NB: pass by value so the print uses a copy
         Entity* tmp = q.top();
         if (tmp != NULL)
         {
-            std::cout << tmp->health() << ' ';
+            //std::cout << tmp->health() << ' ';
+            DebugLogWindows.WriteLog("[Aimbot::run] Priority Queue element: \n", tmp->health());
             q.pop();
         }
     }
