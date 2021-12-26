@@ -269,7 +269,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
             if (tmp != NULL)
             {
                 //std::cout << tmp->health() << ' ';
-                DebugLogWindows.WriteLog("[Aimbot::run] Priority Queue element: %d \n", tmp->health());
+                //DebugLogWindows.WriteLog("[Aimbot::run] Priority Queue element: %d \n", tmp->health());
                 for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
                     //below line trying to get bone config in the GUI and get the actual position of the bone
                     const auto bonePosition = tmp->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
@@ -345,7 +345,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
             if (config->aimbot[weaponIndex].autoShot && activeWeapon->nextPrimaryAttack() <= memory->globalVars->serverTime() && !clamped && activeWeapon->getInaccuracy() <= config->aimbot[weaponIndex].maxShotInaccuracy)
             {
                 //DebugLogWindows.WriteLog("[Aimbot::run]  second if UserCmd::IN_ATTACK \n");
-               // cmd->buttons |= UserCmd::IN_ATTACK;
+                cmd->buttons |= UserCmd::IN_ATTACK;
             }
             if (clamped)
             {
