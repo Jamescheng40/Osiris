@@ -220,49 +220,98 @@ void Aimbot::run(UserCmd* cmd) noexcept
                 || !entity->isOtherEnemy(localPlayer.get()) && !config->aimbot[weaponIndex].friendlyFire || entity->gunGameImmunity())
                 continue;
             entityqueue.push(entity);
+
+
             //DebugLogWindows.WriteLog("[Aimbot::run]  entity num %d \n", i);
             //DebugLogWindows.WriteLog("entity health %d \n", curentityhp);
             //if (curentityhp < lowesthealth)
             //{
             //    lowesthealth = curentityhp;
             //    lowesthealthentity = entity;
-
-
             //}
-
             
-            for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
-                //below line trying to get bone config in the GUI and get the actual position of the bone
-                const auto bonePosition = entity->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
+    //purpose: loop through bone position and find the one that has the most suitable config. EX, fov,bone config and etc
+            //for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
+            //    //below line trying to get bone config in the GUI and get the actual position of the bone
+            //    const auto bonePosition = entity->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
 
-                const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
+            //    const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
 
-                const auto fov = std::hypot(angle.x, angle.y);
-                if (fov > bestFov)
-                {
-                    //DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
-                    continue;
-                }
-                if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
-                    continue;
+            //    const auto fov = std::hypot(angle.x, angle.y);
+            //    if (fov > bestFov)
+            //    {
+            //        //DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
+            //        continue;
+            //    }
+            //    if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
+            //        continue;
 
-                if (!entity->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(entity, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? entity->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
-                    continue;
+            //    if (!entity->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(entity, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? entity->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
+            //        continue;
 
-                //best target is the bone position
-                if (fov < bestFov) {
-                    bestFov = fov;
-                    bestTarget = bonePosition;
-                    //DebugLogWindows.WriteLog("[Aimbot::run]  bestFov in the bone %f \n", bestFov);
-                }
-                if (config->aimbot[weaponIndex].bone)
-                    break;
-            }
+            //    //best target is the bone position
+            //    if (fov < bestFov) {
+            //        bestFov = fov;
+            //        bestTarget = bonePosition;
+            //        //DebugLogWindows.WriteLog("[Aimbot::run]  bestFov in the bone %f \n", bestFov);
+            //    }
+            //    if (config->aimbot[weaponIndex].bone)
+            //        break;
+            //}
 
         }
 
 
-        print_queue(entityqueue);
+        //todo: function getVisibleEnermy
+        while (!entityqueue.empty()) {
+            Entity* tmp = entityqueue.top();
+            bool isconfigfailed = true;
+            if (tmp != NULL)
+            {
+                //std::cout << tmp->health() << ' ';
+                DebugLogWindows.WriteLog("[Aimbot::run] Priority Queue element: %d \n", tmp->health());
+                for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
+                    //below line trying to get bone config in the GUI and get the actual position of the bone
+                    const auto bonePosition = tmp->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
+
+                    const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
+
+                    const auto fov = std::hypot(angle.x, angle.y);
+                    if (fov > bestFov)
+                    {
+                        continue;
+                    }
+                    if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
+                        continue;
+                    //check for bone visibility
+                    if (!tmp->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(tmp, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? tmp->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
+                    {
+                        continue;
+                    }
+                    //best target is the bone position
+                    if (fov < bestFov) {
+                        bestFov = fov;
+                        bestTarget = bonePosition;
+                        isconfigfailed = false;
+                    
+                    }
+                    if (config->aimbot[weaponIndex].bone)
+                        break;
+                }
+
+                
+            }
+            if (isconfigfailed == true)
+            {
+                entityqueue.pop();
+            }
+            else
+            {
+
+                break;
+            }
+        }
+        
         if (bestTarget.notNull()) {
             static Vector lastAngles{ cmd->viewangles };
             static int lastCommand{ };
