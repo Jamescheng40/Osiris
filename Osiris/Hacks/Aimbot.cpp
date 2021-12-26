@@ -284,7 +284,9 @@ void Aimbot::run(UserCmd* cmd) noexcept
                     if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
                         continue;
                     //check for bone visibility
-                    if (!tmp->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(tmp, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? tmp->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
+                    //if (!tmp->isVisible(bonePosition) &&
+                        
+                    if((config->aimbot[weaponIndex].visibleOnly || !canScan(tmp, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? tmp->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
                     {
                         continue;
                     }
