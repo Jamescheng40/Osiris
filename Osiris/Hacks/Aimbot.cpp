@@ -4,6 +4,11 @@
 #include <initializer_list>
 #include <memory>
 
+#include <functional>
+#include <queue>
+#include <vector>
+#include <iostream>
+
 #include "Aimbot.h"
 #include "../Config.h"
 #include "../InputUtil.h"
@@ -144,6 +149,19 @@ void Aimbot::updateInput() noexcept
         keyPressed = !keyPressed;
 }
 
+template<typename T>
+void print_queue(T q) { // NB: pass by value so the print uses a copy
+    while (!q.empty()) {
+        Entity* tmp = q.top();
+        if (tmp != NULL)
+        {
+            std::cout << tmp->health() << ' ';
+            q.pop();
+        }
+    }
+    std::cout << '\n';
+}
+
 void Aimbot::run(UserCmd* cmd) noexcept
 {
     if (!localPlayer || localPlayer->nextAttack() > memory->globalVars->serverTime() || localPlayer->isDefusing() || localPlayer->waitForNoAttack())
@@ -186,52 +204,64 @@ void Aimbot::run(UserCmd* cmd) noexcept
         const auto localPlayerEyePosition = localPlayer->getEyePosition();
         const auto aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() : Vector{ };
 
-        int lowesthealth = INT_MAX;
-        auto lowesthealthentity = interfaces->entityList->getEntity(1);
+        //int lowesthealth = INT_MAX;
+       // auto lowesthealthentity = interfaces->entityList->getEntity(1);
+
+        //priority queue to solve second min problem
+        std::vector<Entity> entityhplist;
+        auto cmp = [](Entity* left, Entity* right) { return left->health() > right->health(); };
+        std::priority_queue<Entity*, std::vector<Entity*>, decltype(cmp)> entityqueue(cmp);
+
         for (int i = 1; i <= interfaces->engine->getMaxClients(); i++) {
             auto entity = interfaces->entityList->getEntity(i);
-            auto curentityhp = entity->health();
+            
             if (!entity || entity == localPlayer.get() || entity->isDormant() || !entity->isAlive()
                 || !entity->isOtherEnemy(localPlayer.get()) && !config->aimbot[weaponIndex].friendlyFire || entity->gunGameImmunity())
                 continue;
-            DebugLogWindows.WriteLog("[Aimbot::run]  entity num %d \n", i);
-            DebugLogWindows.WriteLog("entity health %d \n", curentityhp);
-            if (curentityhp < lowesthealth)
-            {
-                lowesthealth = curentityhp;
-                lowesthealthentity = entity;
+            entityqueue.push(entity);
+            //DebugLogWindows.WriteLog("[Aimbot::run]  entity num %d \n", i);
+            //DebugLogWindows.WriteLog("entity health %d \n", curentityhp);
+            //if (curentityhp < lowesthealth)
+            //{
+            //    lowesthealth = curentityhp;
+            //    lowesthealthentity = entity;
 
-                for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
-                    //below line trying to get bone config in the GUI and get the actual position of the bone
-                    const auto bonePosition = entity->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
 
-                    const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
+            //}
 
-                    const auto fov = std::hypot(angle.x, angle.y);
-                    if (fov > bestFov)
-                    {
-                        //DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
-                        continue;
-                    }
-                    if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
-                        continue;
+            
+            for (auto bone : { 8, 4, 3, 7, 6, 5 }) {
+                //below line trying to get bone config in the GUI and get the actual position of the bone
+                const auto bonePosition = entity->getBonePosition(config->aimbot[weaponIndex].bone > 1 ? 10 - config->aimbot[weaponIndex].bone : bone);
 
-                    if (!entity->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(entity, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? entity->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
-                        continue;
+                const auto angle = calculateRelativeAngle(localPlayerEyePosition, bonePosition, cmd->viewangles + aimPunch);
 
-                    //best target is the bone position
-                    if (fov < bestFov) {
-                        bestFov = fov;
-                        bestTarget = bonePosition;
-                        DebugLogWindows.WriteLog("[Aimbot::run]  bestFov in the bone %f \n", bestFov);
-                    }
-                    if (config->aimbot[weaponIndex].bone)
-                        break;
+                const auto fov = std::hypot(angle.x, angle.y);
+                if (fov > bestFov)
+                {
+                    //DebugLogWindows.WriteLog("[Aimbot::run]  fov continued/skipped \n");
+                    continue;
                 }
+                if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
+                    continue;
+
+                if (!entity->isVisible(bonePosition) && (config->aimbot[weaponIndex].visibleOnly || !canScan(entity, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? entity->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
+                    continue;
+
+                //best target is the bone position
+                if (fov < bestFov) {
+                    bestFov = fov;
+                    bestTarget = bonePosition;
+                    //DebugLogWindows.WriteLog("[Aimbot::run]  bestFov in the bone %f \n", bestFov);
+                }
+                if (config->aimbot[weaponIndex].bone)
+                    break;
             }
 
         }
 
+
+        print_queue(entityqueue);
         if (bestTarget.notNull()) {
             static Vector lastAngles{ cmd->viewangles };
             static int lastCommand{ };
@@ -252,35 +282,35 @@ void Aimbot::run(UserCmd* cmd) noexcept
             cmd->viewangles += angle;
             if (!config->aimbot[weaponIndex].silent)
             {
-                DebugLogWindows.WriteLog("[Aimbot::run][inside set angle]Here to set angle \n");
+                //DebugLogWindows.WriteLog("[Aimbot::run][inside set angle]Here to set angle \n");
                 interfaces->engine->setViewAngles(cmd->viewangles);
             }
 
             if (config->aimbot[weaponIndex].autoScope && activeWeapon->nextPrimaryAttack() <= memory->globalVars->serverTime() && activeWeapon->isSniperRifle() && !localPlayer->isScoped())
             {
-                DebugLogWindows.WriteLog("[Aimbot::run] first if UserCmd::IN_ATTACK2 \n");
+                //DebugLogWindows.WriteLog("[Aimbot::run] first if UserCmd::IN_ATTACK2 \n");
                 cmd->buttons |= UserCmd::IN_ATTACK2;
             }
 
             if (config->aimbot[weaponIndex].autoShot && activeWeapon->nextPrimaryAttack() <= memory->globalVars->serverTime() && !clamped && activeWeapon->getInaccuracy() <= config->aimbot[weaponIndex].maxShotInaccuracy)
             {
-                DebugLogWindows.WriteLog("[Aimbot::run]  second if UserCmd::IN_ATTACK \n");
+                //DebugLogWindows.WriteLog("[Aimbot::run]  second if UserCmd::IN_ATTACK \n");
                // cmd->buttons |= UserCmd::IN_ATTACK;
             }
             if (clamped)
             {
-                DebugLogWindows.WriteLog("[Aimbot::run]  clamped third if UserCmd::IN_ATTAC \n");
+                //DebugLogWindows.WriteLog("[Aimbot::run]  clamped third if UserCmd::IN_ATTAC \n");
                 cmd->buttons &= ~UserCmd::IN_ATTACK;
             }
             if (clamped || config->aimbot[weaponIndex].smooth > 1.0f)
             {
-                DebugLogWindows.WriteLog("[Aimbot::run] lastAngles = cmd->viewangles; \n");
+                //DebugLogWindows.WriteLog("[Aimbot::run] lastAngles = cmd->viewangles; \n");
                 lastAngles = cmd->viewangles;
             }
             else lastAngles = Vector{ };
 
             lastCommand = cmd->commandNumber;
-            DebugLogWindows.WriteLog("[Aimbot::run] last command %d \n", lastCommand);
+            //DebugLogWindows.WriteLog("[Aimbot::run] last command %d \n", lastCommand);
         }
     }
 }
