@@ -28,7 +28,7 @@
 #include "../SDK/WeaponData.h"
 
 //debug port 
-struct _DebugLogWindows DebugLogWindows;
+extern struct _DebugLogWindows DebugLogWindows;
 
 Vector bestTarget{ };
 Vector Aimbot::calculateRelativeAngle(const Vector& source, const Vector& destination, const Vector& viewAngles) noexcept
@@ -284,7 +284,8 @@ void Aimbot::run(UserCmd* cmd) noexcept
                     if (!config->aimbot[weaponIndex].ignoreSmoke && memory->lineGoesThroughSmoke(localPlayerEyePosition, bonePosition, 1))
                         continue;
                     //check for bone visibility
-                    //if (!tmp->isVisible(bonePosition) &&
+                    bool test = tmp->isVisible(bonePosition);
+                        
                         
                     //if((config->aimbot[weaponIndex].visibleOnly || !canScan(tmp, bonePosition, activeWeapon->getWeaponData(), config->aimbot[weaponIndex].killshot ? tmp->health() : config->aimbot[weaponIndex].minDamage, config->aimbot[weaponIndex].friendlyFire)))
                     //{

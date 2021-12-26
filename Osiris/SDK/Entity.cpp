@@ -10,6 +10,8 @@
 #include "Engine.h"
 #include "EngineTrace.h"
 #include "LocalPlayer.h"
+#include "../DebugWindows.h"
+struct _DebugLogWindows DebugLogWindows;
 
 bool Entity::setupBones(matrix3x4* out, int maxBones, int boneMask, float currentTime) noexcept
 {
@@ -44,6 +46,7 @@ bool Entity::isVisible(const Vector& position) noexcept
 
     Trace trace;
     interfaces->engineTrace->traceRay({ localPlayer->getEyePosition(), position.notNull() ? position : getBonePosition(8) }, 0x46004009, { localPlayer.get() }, trace);
+    DebugLogWindows.WriteLog("[Entity::isVisible] trace fraction %f \n", trace.fraction);
     return trace.entity == this || trace.fraction > 0.97f;
 }
 
