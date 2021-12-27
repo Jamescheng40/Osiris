@@ -132,7 +132,7 @@ public:
     bool setupBones(matrix3x4* out, int maxBones, int boneMask, float currentTime) noexcept;
     Vector getBonePosition(int bone) noexcept;
 
-    bool isVisible(const Vector& position = { }) noexcept;
+    bool isVisible(const Vector& position = { }, float tracefraction = 0.97f) noexcept;
     bool isOtherEnemy(Entity* other) noexcept;
 
     VarMap& getVarMap() noexcept

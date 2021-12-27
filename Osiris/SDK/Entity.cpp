@@ -39,7 +39,7 @@ Vector Entity::getBonePosition(int bone) noexcept
         return Vector{ };
 }
 
-bool Entity::isVisible(const Vector& position) noexcept
+bool Entity::isVisible(const Vector& position, float tracefraction) noexcept
 {
     if (!localPlayer)
         return false;
@@ -47,7 +47,7 @@ bool Entity::isVisible(const Vector& position) noexcept
     Trace trace;
     interfaces->engineTrace->traceRay({ localPlayer->getEyePosition(), position.notNull() ? position : getBonePosition(8) }, 0x46004009, { localPlayer.get() }, trace);
     DebugLogWindows.WriteLog("[Entity::isVisible] trace fraction %f \n", trace.fraction);
-    return trace.entity == this || trace.fraction > 0.97f;
+    return trace.entity == this || trace.fraction > tracefraction;
 }
 
 bool Entity::isOtherEnemy(Entity* other) noexcept
