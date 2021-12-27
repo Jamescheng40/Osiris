@@ -58,7 +58,7 @@ public:
     bool aimbotOnKey{ false };
     KeyBind aimbotKey;
     int aimbotKeyMode{ 0 };
-
+  
     struct Triggerbot {
         bool enabled = false;
         bool friendlyFire = false;
@@ -90,6 +90,7 @@ public:
     std::unordered_map<std::string, Chams> chams;
     KeyBindToggle chamsToggleKey;
     KeyBind chamsHoldKey;
+    KeyBind targetLowhealthonly;
 
     struct StreamProofESP {
         KeyBindToggle toggleKey;

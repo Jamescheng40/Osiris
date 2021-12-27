@@ -293,6 +293,10 @@ void Config::load(const char8_t* name, bool incremental) noexcept
     read(j, "Aimbot", aimbot);
     read(j, "Aimbot On key", aimbotOnKey);
     read(j, "Aimbot Key", aimbotKey);
+
+    //target low health key
+    targetLowhealthonly = KeyBind{"C"};
+
     read(j, "Aimbot Key mode", aimbotKeyMode);
 
     read(j, "Triggerbot", triggerbot);
