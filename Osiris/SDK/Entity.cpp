@@ -46,7 +46,7 @@ bool Entity::isVisible(const Vector& position, float tracefraction) noexcept
 
     Trace trace;
     interfaces->engineTrace->traceRay({ localPlayer->getEyePosition(), position.notNull() ? position : getBonePosition(8) }, 0x46004009, { localPlayer.get() }, trace);
-    DebugLogWindows.WriteLog("[Entity::isVisible] trace fraction %f \n", trace.fraction);
+    //DebugLogWindows.WriteLog("[Entity::isVisible] trace fraction %f \n", trace.fraction);
     return trace.entity == this || trace.fraction > tracefraction;
 }
 
