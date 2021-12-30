@@ -275,10 +275,12 @@ static void drawHealthBar(const HealthBar& config, const ImVec2& pos, float heig
 {
     if (!config.enabled)
         return;
+    if (health >= 2000)
+        return;
 
     constexpr float width = 3.0f;
 
-    drawList->PushClipRect(pos + ImVec2{ 0.0f, (4000.0f - health) / 4000.0f * height }, pos + ImVec2{ width + 1.0f, height + 1.0f });
+    drawList->PushClipRect(pos + ImVec2{ 0.0f, (2000.0f - health) / 2000.f * height }, pos + ImVec2{ width + 1.0f, height + 1.0f });
 
     if (config.type == HealthBar::Gradient) {
         const auto green = Helpers::calculateColor(0, 255, 0, 255);
@@ -295,7 +297,7 @@ static void drawHealthBar(const HealthBar& config, const ImVec2& pos, float heig
         max.y += height / 2.0f;
         drawList->AddRectFilledMultiColor(ImFloor(min), ImFloor(max), yellow, yellow, red, red);
     } else {
-        const auto color = config.type == HealthBar::HealthBased ? Helpers::healthColor(std::clamp(health / 4000.0f, 0.0f, 1.0f)) : Helpers::calculateColor(config.asColor4());
+        const auto color = config.type == HealthBar::HealthBased ? Helpers::healthColor(std::clamp(health / 2000.0f, 0.0f, 1.0f)) : Helpers::calculateColor(config.asColor4());
         drawList->AddRectFilled(pos + ImVec2{ 1.0f, 1.0f }, pos + ImVec2{ width + 1.0f, height + 1.0f }, color & IM_COL32_A_MASK);
         drawList->AddRectFilled(pos, pos + ImVec2{ width, height }, color);
     }
